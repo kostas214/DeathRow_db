@@ -63,7 +63,12 @@ typedef struct reportList
 } report;
 
 int parse_report(report *Report, char buffer[]); // Check info of user input and decide whether a report should be made
-void addReport(report *input);					 // Insert the report onto the list
+void add_to_list(report *input, report **first, report **last, int *entries); // Insert the report onto the list
+
+void delete(report **first, report **last, int index, int *entries); //fully customizable delete function
+
+void clear_report(report *input); //free up a report from memory
+
 int is_digits(char buffer[]);
 const char *err_to_str(int err);
 
@@ -72,18 +77,54 @@ int main(void)
 
 	report *first = NULL;
 	report *last = NULL;
-
-	char buffer[] = "Miller;John;50;White;Cansas;40;12;1;2;3;It wasn't me";
-
-	report new_report;
-
-	int err_code = parse_report(&new_report, buffer);
-
-	if (err_code != SUCCESS)
+	int entries = 0;
+	
+	for (int i=0; i<10; i++)
 	{
-		printf("%s\n",err_to_str(err_code));
+
+		char buffer[] = "Miller;John;50;White;Kansas;40;12;1;2;3;It wasn't me";
+
+		report *new_report = (report*) malloc(sizeof(report));
+		if (new_report == NULL) break;
+
+		int err_code = parse_report(new_report, buffer);
+
+		if (err_code != SUCCESS)
+		{
+			printf("%s\n",err_to_str(err_code));
+			clear_report(new_report);
+		}
+		else if (err_code == SUCCESS)
+		{
+			add_to_list(new_report, &first, &last, &entries);
+			printf("%x %x %d\n", new_report,new_report->next, entries);
+		}
+	
 	}
 	
+	delete(&first, &last, entries ,&entries);
+	printf("Item deleted, entries left: %d\n", entries);
+	delete(&first, &last, 1 ,&entries);
+	printf("Item deleted, entries left: %d\n", entries);
+	delete(&first, &last, 5 ,&entries);
+	printf("Item deleted, entries left: %d\n", entries);
+	delete(&first, &last, 11 ,&entries);
+	delete(&first, &last, -4 ,&entries);
+	delete(&first, &last, 1 ,&entries);
+	printf("Item deleted, entries left: %d\n", entries);
+	delete(&first, &last, 1 ,&entries);
+	printf("Item deleted, entries left: %d\n", entries);
+	delete(&first, &last, 1 ,&entries);
+	printf("Item deleted, entries left: %d\n", entries);
+	delete(&first, &last, 1 ,&entries);
+	printf("Item deleted, entries left: %d\n", entries);
+	delete(&first, &last, 1 ,&entries);
+	printf("Item deleted, entries left: %d\n", entries);
+	delete(&first, &last, 1 ,&entries);
+	printf("Item deleted, entries left: %d\n", entries);
+	delete(&first, &last, 1 ,&entries);
+	printf("Item deleted, entries left: %d\n", entries);
+	delete(&first, &last, 1 ,&entries);
 	
 	return 0;
 }
@@ -290,18 +331,18 @@ int parse_report(report *Report, char buffer[])
 	Report->num_victims = num_victims;
 	Report->final_words = strdup(final_words);
 
-	printf("%s, %s, %d, %s, %s, %d, %d, %d, %d, %d, %s\n",
-		   Report->surname,
-		   Report->name,
-		   Report->age,
-		   Report->race,
-		   Report->city,
-		   Report->felony_age,
-		   Report->education,
-		   Report->male_victims,
-		   Report->fem_victims,
-		   Report->num_victims,
-		   Report->final_words);
+	//printf("%s, %s, %d, %s, %s, %d, %d, %d, %d, %d, %s\n",
+		   //Report->surname,
+		   //Report->name,
+		   //Report->age,
+		   //Report->race,
+		   //Report->city,
+		   //Report->felony_age,
+		   //Report->education,
+		   //Report->male_victims,
+		   //Report->fem_victims,
+		   //Report->num_victims,
+		   //Report->final_words);
 
 	return SUCCESS;
 }
@@ -365,4 +406,97 @@ const char *err_to_str(int err)
     default:
         return "Unknown error.";
     }
+}
+
+void add_to_list(report *input, report **first, report **last, int *entries)
+{
+	if (*last == NULL) //First element
+	{
+		*first = input;
+		*last = input;
+		input->next = input;
+	}
+	
+	else if (*last != NULL)
+	{
+		(*last)->next = input;
+		*last = input;
+		input->next = *first;
+	}
+	(*entries)++;
+}
+
+void delete(report **first, report **last, int index, int *entries)
+{
+	if (*entries == 0) {
+		printf("Nothing to delete -- list is empty\n"); //"erm only chatpeetee uses emdashes" betas when omega male emdash user:
+		return;
+	}
+		
+	else if (index == 1) //delete first element (deleteR)
+	{
+		report *tmp = *first;
+		if (*entries == 1)
+		{
+			clear_report(*first);
+			*first = NULL;
+			*last = NULL;
+			(*entries)--;
+		}
+		else
+		{
+			*first = (*first)->next;
+			(*last)->next = *first;
+			clear_report(tmp);
+			(*entries)--;
+		}
+	}
+	else if (index == *entries) //delete last element (deleteO)
+	{
+		report *tmp = *first;
+		if (*entries == 1)
+		{
+			clear_report(*last);
+			*first = NULL;
+			*last = NULL;
+			(*entries)--;
+		}
+		else
+		{
+			while (tmp->next->next != *first) //find second to last element of list
+			{
+				tmp = tmp->next;
+			}
+			clear_report(tmp->next);
+			*last = tmp;
+			tmp->next = *first;
+			(*entries)--;
+		}
+	}
+	else if (0 < index && index < *entries) //delete anything thats not the first or last element
+	{
+		int i;
+		report *tmp = *first;
+		report *tmp2;
+		for (int i=1; i<index-1; i++) //stop at the previous element of the one we wanna delete
+			tmp = tmp->next;
+		
+		tmp2 = tmp->next->next;
+		clear_report(tmp->next);
+		tmp->next = tmp2;
+		(*entries)--;
+	}
+	else
+		printf("We couldn't find what you're looking for\n");
+	
+}
+
+void clear_report(report *input)
+{
+	free(input->surname);
+	free(input->name);
+	free(input->race);
+	free(input->city);
+	free(input->final_words);
+	free(input);
 }
