@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <ctype.h>
+
+#include "str_utils.h"
 
 #define ERR_INVALID_FORMAT -1
 #define ERR_SURNAME_NOT_SPECIFIED -2
@@ -69,7 +70,6 @@ void delete(report **first, report **last, int index, int *entries); //fully cus
 
 void clear_report(report *input); //free up a report from memory
 
-int is_digits(char buffer[]);
 const char *err_to_str(int err);
 
 int main(void)
@@ -83,7 +83,6 @@ int main(void)
 	{
 
 		char buffer[] = "Miller;John;50;White;Kansas;40;12;1;2;3;It wasn't me";
-
 		report *new_report = (report*) malloc(sizeof(report));
 		if (new_report == NULL) break;
 
@@ -91,13 +90,12 @@ int main(void)
 
 		if (err_code != SUCCESS)
 		{
-			printf("%s\n",err_to_str(err_code));
-			clear_report(new_report);
+			free(new_report);//no values are written unless the parse is successful
 		}
-		else if (err_code == SUCCESS)
+		else
 		{
 			add_to_list(new_report, &first, &last, &entries);
-			printf("%x %x %d\n", new_report,new_report->next, entries);
+			printf("%p %p %d\n", new_report,new_report->next, entries);
 		}
 	
 	}
@@ -129,7 +127,7 @@ int main(void)
 	return 0;
 }
 
-int parse_report(report *Report, char buffer[])
+int parse_report(report *Report, char *buffer)
 {
 
 	int i, j;
@@ -150,19 +148,18 @@ int parse_report(report *Report, char buffer[])
 			return ERR_INVALID_FORMAT;
 		}
 	}
-
+	
 	// Parse values
-
 	char *surname = NULL;
 	char *name = NULL;
-	int age = -1;
+	int age = REPORT_NA;
 	char *race = NULL;
 	char *city = NULL;
-	int felony_age = -1;
-	int education = -1;
-	int male_victims = -1;
-	int fem_victims = -1;
-	int num_victims = -1;
+	int felony_age = REPORT_NA;
+	int education = REPORT_NA;
+	int male_victims = REPORT_NA;
+	int fem_victims = REPORT_NA;
+	int num_victims = REPORT_NA;
 	char *final_words = NULL;
 
 	if (strlen(report_elements[0]) == 0)
@@ -347,14 +344,7 @@ int parse_report(report *Report, char buffer[])
 	return SUCCESS;
 }
 
-int is_digits(char buffer[])
-{
-	int i;
-	for (i = 0; i < strlen(buffer); i++)
-		if (!isdigit(buffer[i]))
-			return 0;
-	return 1;
-}
+
 
 
 const char *err_to_str(int err)
@@ -429,7 +419,7 @@ void add_to_list(report *input, report **first, report **last, int *entries)
 void delete(report **first, report **last, int index, int *entries)
 {
 	if (*entries == 0) {
-		printf("Nothing to delete -- list is empty\n"); //"erm only chatpeetee uses emdashes" betas when omega male emdash user:
+		printf("Nothing to delete -- list is empty\n"); //"erm only chatpeetee τσατ ποιητης uses emdashes" betas when omega male emdash user:
 		return;
 	}
 		
