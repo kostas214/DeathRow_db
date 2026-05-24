@@ -63,12 +63,14 @@ typedef struct reportList
 
 } report;
 
-int parse_report(report *Report, char buffer[]); // Check info of user input and decide whether a report should be made
+int parse_report(report *Report, char *buffer, char *insert_type); // Check info of user input and decide whether a report should be made
 void add_to_list(report *input, report **first, report **last, int *entries); // Insert the report onto the list
 
 void delete(report **first, report **last, int index, int *entries); //fully customizable delete function
 
 void clear_report(report *input); //free up a report from memory
+
+void save_to_file(char* filename, report *first,int entries);
 
 const char *err_to_str(int err);
 
@@ -79,14 +81,14 @@ int main(void)
 	report *last = NULL;
 	int entries = 0;
 	
-	for (int i=0; i<10; i++)
+	for (int i=0; i<9; i++)
 	{
 
 		char buffer[] = "Miller;John;50;White;Kansas;40;12;1;2;3;It wasn't me";
 		report *new_report = (report*) malloc(sizeof(report));
 		if (new_report == NULL) break;
 
-		int err_code = parse_report(new_report, buffer);
+		int err_code = parse_report(new_report, buffer, "keyb");
 
 		if (err_code != SUCCESS)
 		{
@@ -100,34 +102,31 @@ int main(void)
 	
 	}
 	
-	delete(&first, &last, entries ,&entries);
+		char buffer[] = "Smith;Arthur;60;White;Pittsburg;30;10;0;1;1;No comment";
+		report *new_report = (report*) malloc(sizeof(report));
+
+		int err_code = parse_report(new_report, buffer, "keyb");
+
+		if (err_code != SUCCESS)
+		{
+			free(new_report);//no values are written unless the parse is successful
+		}
+		else
+		{
+			add_to_list(new_report, &first, &last, &entries);
+			printf("%p %p %d\n", new_report,new_report->next, entries);
+		}
+
+	
+	delete(&first, &last, 3 ,&entries);
 	printf("Item deleted, entries left: %d\n", entries);
-	delete(&first, &last, 1 ,&entries);
-	printf("Item deleted, entries left: %d\n", entries);
-	delete(&first, &last, 5 ,&entries);
-	printf("Item deleted, entries left: %d\n", entries);
-	delete(&first, &last, 11 ,&entries);
-	delete(&first, &last, -4 ,&entries);
-	delete(&first, &last, 1 ,&entries);
-	printf("Item deleted, entries left: %d\n", entries);
-	delete(&first, &last, 1 ,&entries);
-	printf("Item deleted, entries left: %d\n", entries);
-	delete(&first, &last, 1 ,&entries);
-	printf("Item deleted, entries left: %d\n", entries);
-	delete(&first, &last, 1 ,&entries);
-	printf("Item deleted, entries left: %d\n", entries);
-	delete(&first, &last, 1 ,&entries);
-	printf("Item deleted, entries left: %d\n", entries);
-	delete(&first, &last, 1 ,&entries);
-	printf("Item deleted, entries left: %d\n", entries);
-	delete(&first, &last, 1 ,&entries);
-	printf("Item deleted, entries left: %d\n", entries);
-	delete(&first, &last, 1 ,&entries);
+	
+	save_to_file("test.txt", first, entries);
 	
 	return 0;
 }
 
-int parse_report(report *Report, char *buffer)
+int parse_report(report *Report, char *buffer, char *insert_type)
 {
 
 	int i, j;
@@ -327,6 +326,23 @@ int parse_report(report *Report, char *buffer)
 	Report->fem_victims = fem_victims;
 	Report->num_victims = num_victims;
 	Report->final_words = strdup(final_words);
+	
+	strcpy(Report->insert_type, insert_type);
+	
+	//add timestamps
+	time_t curr_time;
+	struct tm *User_time;
+	
+	time(&curr_time);
+	User_time = localtime(&curr_time);
+	
+	Report->date_added.year = User_time->tm_year + 1900;
+	Report->date_added.month = User_time->tm_mon + 1;
+	Report->date_added.day = User_time->tm_mday;
+	
+	Report->time_added.hour = User_time->tm_hour;
+	Report->time_added.minutes = User_time->tm_min;
+	Report->time_added.seconds = User_time->tm_sec;
 
 	//printf("%s, %s, %d, %s, %s, %d, %d, %d, %d, %d, %s\n",
 		   //Report->surname,
@@ -340,6 +356,9 @@ int parse_report(report *Report, char *buffer)
 		   //Report->fem_victims,
 		   //Report->num_victims,
 		   //Report->final_words);
+
+	//printf("%02d/%02d/%02d , %02d:%02d:%02d\n", Report->date_added.day,Report->date_added.month,Report->date_added.year, Report->time_added.hour, Report->time_added.minutes, Report->time_added.seconds);
+	//printf("%s\n", Report->insert_type);
 
 	return SUCCESS;
 }
@@ -489,4 +508,58 @@ void clear_report(report *input)
 	free(input->city);
 	free(input->final_words);
 	free(input);
+}
+
+void save_to_file(char* filename, report *first, int entries)
+{
+
+	if (entries == 0) {
+		printf("Nothing to save\n");
+		return;
+	}
+	
+	FILE *file = fopen(filename, "w");
+	
+	if (file == NULL) {
+		printf("There was a problem with saving to file\n");
+		return;
+	}
+	
+	report *tmp = first;
+	do {
+		fprintf(file, "[%d/%d/%d @ ", tmp->date_added.day, tmp->date_added.month, tmp->date_added.year);
+		fprintf(file, "%02d:%02d:%02d] ", tmp->time_added.hour, tmp->time_added.minutes, tmp->time_added.seconds);
+	
+		fprintf(file, "%s;", tmp->surname);
+		fprintf(file, "%s;", tmp->name);
+		fprintf(file, "%d;", tmp->age);
+		fprintf(file, "%s;", tmp->race);
+		fprintf(file, "%s;", tmp->city);
+		fprintf(file, "%d;", tmp->felony_age);
+		fprintf(file, "%d;", tmp->education);
+		fprintf(file, "%d;", tmp->male_victims);
+		fprintf(file, "%d;", tmp->fem_victims);
+		fprintf(file, "%d;", tmp->num_victims);
+		fprintf(file, "%s\n", tmp->final_words);
+		
+		tmp = tmp->next;
+		
+	} while(tmp->next != first);
+	
+	fprintf(file, "[%d/%d/%d @ ", tmp->date_added.day, tmp->date_added.month, tmp->date_added.year);
+	fprintf(file, "%02d:%02d:%02d] ", tmp->time_added.hour, tmp->time_added.minutes, tmp->time_added.seconds);
+	
+	fprintf(file, "%s;", tmp->surname);
+	fprintf(file, "%s;", tmp->name);
+	fprintf(file, "%d;", tmp->age);
+	fprintf(file, "%s;", tmp->race);
+	fprintf(file, "%s;", tmp->city);
+	fprintf(file, "%d;", tmp->felony_age);
+	fprintf(file, "%d;", tmp->education);
+	fprintf(file, "%d;", tmp->male_victims);
+	fprintf(file, "%d;", tmp->fem_victims);
+	fprintf(file, "%d;", tmp->num_victims);
+	fprintf(file, "%s", tmp->final_words);
+	
+	fclose(file);
 }
