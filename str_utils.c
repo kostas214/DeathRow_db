@@ -56,7 +56,7 @@ char **split_str(char *buffer, char split_char, int *split_len)
         {
             printf("Memory allocation failed\n");
             free_str_arr(split_arr, field_count);
-            return NULL;
+            exit(0);
         }
     }
     else
@@ -78,7 +78,7 @@ char **split_str(char *buffer, char split_char, int *split_len)
             {
                 printf("Memory allocation failed\n");
                 free_str_arr(split_arr, field_count);
-                return NULL;
+                exit(0);
             }
         }
         else

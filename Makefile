@@ -17,8 +17,6 @@ $(PROGRAM) : $(OBJECTS)
 %.o: %.CC
 	$(CC) $(CFLAGS) -c $< -o $@
 
-clean: 
-	rm -f $(OBJECTS) $(PROGRAM)
 
 run: $(PROGRAM)
 	./$(PROGRAM)
