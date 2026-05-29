@@ -174,9 +174,9 @@ int main(void)
 		printf("errcode %d %s\n", err_code2, err_to_str(err_code2));
 	}
 	*/
-	 int error_code = parse_file("texas_new.csv", &first, &last, &entries);
-	 printf("parse done entries %d error code %d\n", entries, error_code);
-	 save_to_file("test.txt", first, entries);
+	int error_code = parse_file("texas_new.csv", &first, &last, &entries);
+	printf("parse done entries %d error code %d\n", entries, error_code);
+	save_to_file("test.txt", first, entries);
 
 	/*
 
@@ -647,11 +647,47 @@ int save_to_file(char *filename, report *first, int entries)
 		fprintf(file, "%d;", tmp->age);
 		fprintf(file, "%s;", tmp->race);
 		fprintf(file, "%s;", tmp->city);
-		fprintf(file, "%d;", tmp->felony_age);
-		fprintf(file, "%d;", tmp->education);
-		fprintf(file, "%d;", tmp->num_victims);
-		fprintf(file, "%d;", tmp->male_victims);
-		fprintf(file, "%d;", tmp->fem_victims);
+		if (tmp->felony_age == REPORT_NA)
+		{
+			fprintf(file, "NA;");
+		}
+		else
+		{
+			fprintf(file, "%d;", tmp->felony_age);
+		}
+		if (tmp->education == REPORT_NA)
+		{
+			fprintf(file, "NA;");
+		}
+		else
+		{
+			fprintf(file, "%d;", tmp->education);
+		}
+
+		if (tmp->num_victims == REPORT_NA)
+		{
+			fprintf(file, "NA;");
+		}
+		else
+		{
+			fprintf(file, "%d;", tmp->num_victims);
+		}
+		if (tmp->male_victims == REPORT_NA)
+		{
+			fprintf(file, "NA;");
+		}
+		else
+		{
+			fprintf(file, "%d;", tmp->male_victims);
+		}
+		if (tmp->fem_victims == REPORT_NA)
+		{
+			fprintf(file, "NA;");
+		}
+		else
+		{
+			fprintf(file, "%d;", tmp->fem_victims);
+		}
 		fprintf(file, "%s\n", tmp->final_words);
 
 		tmp = tmp->next;
@@ -666,11 +702,50 @@ int save_to_file(char *filename, report *first, int entries)
 	fprintf(file, "%d;", tmp->age);
 	fprintf(file, "%s;", tmp->race);
 	fprintf(file, "%s;", tmp->city);
-	fprintf(file, "%d;", tmp->felony_age);
-	fprintf(file, "%d;", tmp->education);
-	fprintf(file, "%d;", tmp->num_victims);
-	fprintf(file, "%d;", tmp->male_victims);
-	fprintf(file, "%d;", tmp->fem_victims);
+
+	if (tmp->felony_age == REPORT_NA)
+	{
+		fprintf(file, "NA;");
+	}
+	else
+	{
+		fprintf(file, "%d;", tmp->felony_age);
+	}
+
+	if (tmp->education == REPORT_NA)
+	{
+		fprintf(file, "NA;");
+	}
+	else
+	{
+		fprintf(file, "%d;", tmp->education);
+	}
+
+	if (tmp->num_victims == REPORT_NA)
+	{
+		fprintf(file, "NA;");
+	}
+	else
+	{
+		fprintf(file, "%d;", tmp->num_victims);
+	}
+	if (tmp->male_victims == REPORT_NA)
+	{
+		fprintf(file, "NA;");
+	}
+	else
+	{
+		fprintf(file, "%d;", tmp->male_victims);
+	}
+	if (tmp->fem_victims == REPORT_NA)
+	{
+		fprintf(file, "NA;");
+	}
+	else
+	{
+		fprintf(file, "%d;", tmp->fem_victims);
+	}
+
 	fprintf(file, "%s", tmp->final_words);
 
 	fclose(file);

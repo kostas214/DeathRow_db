@@ -74,9 +74,30 @@ char **split_str(char *buffer, char split_char, int *split_len)
         {
             split_arr[i] = NULL;
         }
-        else if (buffer_end > split_str + strlen(split_str) + 1 && *(split_str + strlen(split_str) + 1) == split_char)
+        else if (
+            //Check if it starts with " means it can have ; inside
+            split_str[0] == '\"'
+            && 
+            //Check if its the last words field
+            i == 10
+            && 
+            //Check if it actually has more semicolons
+            field_count > 11
+        )
         {
-            printf("%d %d %d\n",i,i+1,field_count);
+            //undo strtok
+            split_str[strlen(split_str)] = ';';
+            split_arr[i] = strdup(split_str);
+            break;
+        }
+        else if (
+            //check if there is a next string in the buffer
+            buffer_end > split_str + strlen(split_str) + 1
+            &&
+            //check if the next string is empty (;;)
+            *(split_str + strlen(split_str) + 1) == split_char)
+        {
+            printf("%d %d %d\n", i, i + 1, field_count);
             split_arr[i] = strdup(split_str);
             split_arr[++i] = NULL;
             continue;
