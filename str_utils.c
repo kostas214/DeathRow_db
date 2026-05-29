@@ -30,6 +30,7 @@ int count_char(const char *buffer, char target_char)
 char **split_str(char *buffer, char split_char, int *split_len)
 {
 
+    char *buffer_end = buffer + strlen(buffer) + 1;
     int field_count = count_char(buffer, split_char) + 1;
 
     *split_len = field_count;
@@ -61,9 +62,7 @@ char **split_str(char *buffer, char split_char, int *split_len)
     }
     else
     {
-        // printf("Error");
-        free_str_arr(split_arr, field_count);
-        return NULL;
+        split_arr[0] = NULL;
     }
 
     int i;
@@ -71,7 +70,18 @@ char **split_str(char *buffer, char split_char, int *split_len)
     {
         split_str = strtok(NULL, delimiter);
 
-        if (split_str != NULL)
+        if (split_str == NULL)
+        {
+            split_arr[i] = NULL;
+        }
+        else if (buffer_end > split_str + strlen(split_str) + 1 && *(split_str + strlen(split_str) + 1) == split_char)
+        {
+            printf("%d %d %d\n",i,i+1,field_count);
+            split_arr[i] = strdup(split_str);
+            split_arr[++i] = NULL;
+            continue;
+        }
+        else if (split_str != NULL)
         {
             split_arr[i] = strdup(split_str);
             if (split_arr[i] == NULL)
@@ -80,11 +90,6 @@ char **split_str(char *buffer, char split_char, int *split_len)
                 free_str_arr(split_arr, field_count);
                 exit(0);
             }
-        }
-        else
-        {
-            free_str_arr(split_arr, field_count);
-            return NULL;
         }
     }
 

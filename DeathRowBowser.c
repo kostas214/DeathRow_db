@@ -23,7 +23,6 @@
 #define SUCCESS 1
 #define RESULT_NOTHING_TO_SAVE 2
 
-
 #define REPORT_NA -1
 
 typedef struct
@@ -133,19 +132,18 @@ int parse_file(char *filename, report **first, report **last, int *entries)
 		}
 		// printf("%s\n", buffer);
 
-		char *idk = strdup(buffer);
 		int parse_error = parse_report(new_report, buffer, "file");
+		free(buffer);
 		if (parse_error == SUCCESS)
 		{
 			add_to_list(new_report, first, last, entries);
 		}
 		else
 		{
-			printf("%s\n", idk);
 			printf("Failed to parse report %s\n", err_to_str(parse_error));
 			free(new_report);
 		}
-		fgetc(fp);
+		fgetc(fp); // read \n
 		len_line = get_len_line(fp);
 	}
 
@@ -163,11 +161,19 @@ int main(void)
 	report *last = NULL;
 	int entries = 0;
 
-	//char buffer[] = "Walker;Tony;36;Black;Morris;37;9;2;1;1;Spoken: I would like to say goodbye to a good friend of mine in Switzerland - Diego. I appreciate all the help and support he gave me through the years. A friend of mine in England. Wildflower: I love you and will never forget you. And to my family. That's all. Written: I wish to tell the family how sorry I am about what I done. I know that nothing I say will bring Mr. and Mr. Bo Simmons back. I ask that if Linda and Gary and their family can find it in their hearts to forgive me, but if not, I will understand. I am truly sorry.";
-	//report *new_report = (report *)malloc(sizeof(report));
-	//int err_code = parse_report(new_report, buffer, "keyb");
-	//printf("errcode %s\n", err_to_str(err_code));
+	/*
+	char buffer[] = "Walker;Tony;37;Black;Morris;36;1;2;1;;a";
+	report *new_report = (report *)malloc(sizeof(report));
+	int err_code = parse_report(new_report, buffer, "keyb");
+	printf("errcode %d %s\n", err_code, err_to_str(err_code));
+	add_to_list(new_report, &first, &last, &entries);
 
+	if (err_code == SUCCESS)
+	{
+		int err_code2 = save_to_file("test.txt", first, entries);
+		printf("errcode %d %s\n", err_code2, err_to_str(err_code2));
+	}
+	*/
 	 int error_code = parse_file("texas_new.csv", &first, &last, &entries);
 	 printf("parse done entries %d error code %d\n", entries, error_code);
 	 save_to_file("test.txt", first, entries);
@@ -376,7 +382,7 @@ int parse_report(report *Report, char *buffer, char *insert_type)
 	}
 
 	// Female victims checks
-	if (!report_elements[8] || strlen(report_elements[9]) == 0 || !is_digits(report_elements[9]))
+	if (!report_elements[9] || strlen(report_elements[9]) == 0 || !is_digits(report_elements[9]))
 	{
 		fem_victims = REPORT_NA;
 	}
