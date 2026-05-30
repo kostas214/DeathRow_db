@@ -75,6 +75,9 @@ void clear_report(report *input); // free up a report from memory
 int save_to_file(char *filename, report *first, int entries);
 int parse_file(char *filename, report **first, report **last, int *entries);
 
+void average(report* first, int entries, char type);
+void count_victims(report* first, int entries, char type);
+
 const char *err_to_str(int err);
 
 int get_len_line(FILE *fp);
@@ -160,9 +163,9 @@ int main(void)
 	report *first = NULL;
 	report *last = NULL;
 	int entries = 0;
-
+	
 	/*
-	char buffer[] = "Walker;Tony;37;Black;Morris;36;1;2;1;;a";
+	char buffer[] = "Cardenas;Ruben;47;Hispanic;Hidalgo;28;11;1;0;1;Ts";
 	report *new_report = (report *)malloc(sizeof(report));
 	int err_code = parse_report(new_report, buffer, "keyb");
 	printf("errcode %d %s\n", err_code, err_to_str(err_code));
@@ -173,10 +176,30 @@ int main(void)
 		int err_code2 = save_to_file("test.txt", first, entries);
 		printf("errcode %d %s\n", err_code2, err_to_str(err_code2));
 	}
+	
+	average(first, entries, 'a');
+	average(first, entries, 'f');
+	average(first, entries, 'e');
+	
+	count_victims(first, entries, 'm');
+	count_victims(first, entries, 'f');
+	count_victims(first, entries, 'a');
+	
 	*/
+	
+	
 	int error_code = parse_file("texas_new.csv", &first, &last, &entries);
 	printf("parse done entries %d error code %d\n", entries, error_code);
 	save_to_file("test.txt", first, entries);
+
+	average(first, entries, 'a');
+	average(first, entries, 'f');
+	average(first, entries, 'e');
+	
+	count_victims(first, entries, 'm');
+	count_victims(first, entries, 'f');
+	count_victims(first, entries, 'a');
+	
 
 	/*
 
@@ -201,6 +224,9 @@ int main(void)
 		}
 	}
 
+	*/
+	
+	/*
 	char buffer[] = "Smith;Arthur;60;White;Pittsburg;30;10;0;1;1;No comment";
 	report *new_report = (report *)malloc(sizeof(report));
 
@@ -209,6 +235,7 @@ int main(void)
 	if (err_code != SUCCESS)
 	{
 		free(new_report); // no values are written unless the parse is successful
+		printf("Error with report\n");
 	}
 	else
 	{
@@ -220,8 +247,8 @@ int main(void)
 	printf("Item deleted, entries left: %d\n", entries);
 
 	save_to_file("test.txt", first, entries);
-
 	*/
+
 	return 0;
 }
 
@@ -637,7 +664,8 @@ int save_to_file(char *filename, report *first, int entries)
 	}
 
 	report *tmp = first;
-	do
+		
+	while (tmp->next != first)
 	{
 		fprintf(file, "[%d/%d/%d @ ", tmp->date_added.day, tmp->date_added.month, tmp->date_added.year);
 		fprintf(file, "%02d:%02d:%02d] ", tmp->time_added.hour, tmp->time_added.minutes, tmp->time_added.seconds);
@@ -692,7 +720,7 @@ int save_to_file(char *filename, report *first, int entries)
 
 		tmp = tmp->next;
 
-	} while (tmp->next != first);
+	}
 
 	fprintf(file, "[%d/%d/%d @ ", tmp->date_added.day, tmp->date_added.month, tmp->date_added.year);
 	fprintf(file, "%02d:%02d:%02d] ", tmp->time_added.hour, tmp->time_added.minutes, tmp->time_added.seconds);
@@ -751,4 +779,118 @@ int save_to_file(char *filename, report *first, int entries)
 	fclose(file);
 
 	return SUCCESS;
+}
+
+void average(report* first, int entries, char type)
+{
+	/* types:
+	a = age
+	f = felony age
+	e = education
+	*/
+	
+	report* tmp = first;
+	int count = 0;
+	
+	if (entries != 0)
+	{
+		if (type == 'a')
+		{
+			while (tmp->next != first)
+			{
+				if (tmp->age != REPORT_NA)
+					count += tmp->age;
+				tmp = tmp->next;
+			}
+			if (tmp->age != REPORT_NA)
+				count += tmp->age;
+		
+			printf("The average age of documented felons is %.2f years\n", count/(float)entries);
+		}
+		else if (type == 'f')
+		{
+			while (tmp->next != first)
+			{
+				if (tmp->felony_age != REPORT_NA)
+					count += tmp->felony_age;
+				tmp = tmp->next;
+			}
+			if (tmp->felony_age != REPORT_NA)
+				count += tmp->felony_age;
+		
+			printf("The average felony age of documented felons is %.2f years\n", count/(float)entries);
+		}
+		else if (type == 'e')
+		{
+			while (tmp->next != first)
+			{
+				if (tmp->education != REPORT_NA)
+					count += tmp->education;
+				tmp = tmp->next;
+			}
+			if (tmp->education != REPORT_NA)
+				count += tmp->education;
+		
+			printf("The average education level of documented felons is %.2f years\n", count/(float)entries);
+		}
+	}
+	else
+		printf("List is empty\n");
+}
+
+void count_victims(report* first, int entries, char type)
+{
+	/* types:
+	m = male
+	f = female
+	a = all
+	*/
+	
+	report* tmp = first;
+	int count = 0;
+	
+	if (entries != 0)
+	{
+		if (type == 'm')
+		{
+			while (tmp->next != first)
+			{
+				if (tmp->male_victims != REPORT_NA)
+					count += tmp->male_victims;
+				tmp = tmp->next;
+			}
+			if (tmp->male_victims != REPORT_NA)
+				count += tmp->male_victims;
+				
+			printf("Number of male victims from documented felons: %d\n", count);
+		}
+		else if (type == 'f')
+		{
+			while (tmp->next != first)
+			{
+				if (tmp->fem_victims != REPORT_NA)
+					count += tmp->fem_victims;
+				tmp = tmp->next;
+			}
+			if (tmp->fem_victims != REPORT_NA)
+				count += tmp->fem_victims;
+		
+			printf("Number of female victims from documented felons: %d\n", count);
+		}
+		else if (type == 'a')
+		{
+			while (tmp->next != first)
+			{
+				if (tmp->num_victims != REPORT_NA)
+					count += tmp->num_victims;
+				tmp = tmp->next;
+			}
+			if (tmp->num_victims != REPORT_NA)
+				count += tmp->num_victims;
+		
+			printf("Number of total victims from documented felons: %d\n", count);
+		}
+	}
+	else
+		printf("List is empty\n");
 }
