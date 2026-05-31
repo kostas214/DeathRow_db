@@ -1,8 +1,9 @@
-#include "str_utils.h"
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "str_utils.h"
 
 int is_digits(const char *buffer)
 {

@@ -1,7 +1,7 @@
 TITLE = DeathRowBowser
 
 
-SOURCES = $(TITLE).c str_utils.c
+SOURCES = $(TITLE).c str_utils.c commands.c errors.c report.c
 
 
 CC = gcc
