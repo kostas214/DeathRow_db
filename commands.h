@@ -11,6 +11,8 @@ int count_fields(report *first, int entries, int *result, int (*get_field)(repor
 void print_report(report *report);
 int average_command(report *first,int entries ,char *command_str);
 int count_command(report *first,int entries ,char *command_str);
+int find(report *first, int entries, int *result, char* (*get_field)(report *), char* argument ,char type);
+int find_command(report *first, int entries, char *command_str);
 
 int get_age(report *r);
 int get_felony_age(report *r);
@@ -18,5 +20,9 @@ int get_education(report *r);
 int get_num_victims(report *r);
 int get_male_victims(report *r);
 int get_fem_victims(report *r);
+char* get_final(report *r);
+char* get_race(report *r);
+char* get_name(report *r);
+char* get_surname(report *r);
 
 #endif
