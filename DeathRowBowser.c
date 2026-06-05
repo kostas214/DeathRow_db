@@ -28,8 +28,15 @@ int main(void)
 	printf("count result %d %s\n",err_code,err_to_str(err_code));
 
 
-	print_report(first);
+	//print_report(first);
+	
+	find_command(first, entries, strdup("findF pain"));
+	find_command(first, entries, strdup("findR Black"));
+	find_command(first, entries, strdup("findN John"));
+	find_command(first, entries, strdup("findS Smith"));
 
+
+	/* TODO print_report() doesnt display NA */
 
 	return 0;
 }
