@@ -14,9 +14,23 @@ int main(void)
 	int entries = 0;
 	int err_code = 0;
 
-	err_code = parse_file("texas_new.csv", &first, &last, &entries);
-	printf("parse done entries %d error code %d\n\n", entries, err_code);
-	save_to_file("test.txt", first, entries);
+	err_code = load_command(&first, &last, &entries, strdup("load texas_new.csv"));
+	printf("load command result %d %s\n\n", err_code, err_to_str(err_code));
+
+	err_code = new_report_command(&first, &last, &entries, strdup("newReport Fuller;Barney;58;White;Houston;45;9;2;1;1;I don't have anything to say, you can proceed Warden Jones."));
+	printf("new_report command result %d %s\n\n", err_code, err_to_str(err_code));
+
+	err_code = delete_command(&first, &last, &entries, "deleteO");
+	printf("delete command result %d %s\n\n", err_code, err_to_str(err_code));
+
+	err_code = delete_command(&first, &last, &entries, "deleteR");
+	printf("delete command result %d %s\n\n", err_code, err_to_str(err_code));
+
+	err_code = delete_command(&first, &last, &entries, "delete 3");
+	printf("delete command result %d %s\n\n", err_code, err_to_str(err_code));
+
+	err_code = save_command(first, entries, strdup("save test.txt"));
+	printf("save command result %d %s\n\n", err_code, err_to_str(err_code));
 
 	err_code = average_command(first, entries, strdup("avg age"));
 	printf("avg command result %d %s\n\n", err_code, err_to_str(err_code));
@@ -24,27 +38,23 @@ int main(void)
 	err_code = count_command(first, entries, strdup("count men"));
 	printf("count result %d %s\n\n", err_code, err_to_str(err_code));
 
-	// print_report(first);
-
-	//err_code = find_command(first, entries, strdup("findF pain"));
+	err_code = find_command(first, entries, strdup("findF pain"));
 	printf("find result %d %s\n\n", err_code, err_to_str(err_code));
 
-	//err_code = find_command(first, entries, strdup("findR black"));
+	err_code = find_command(first, entries, strdup("findR black"));
 	printf("find result %d %s\n\n", err_code, err_to_str(err_code));
 
-	//err_code = find_command(first, entries, strdup("findN John"));
+	err_code = find_command(first, entries, strdup("findN John"));
 	printf("find result %d %s\n\n", err_code, err_to_str(err_code));
 
-	//err_code = find_command(first, entries, strdup("findS Smith"));
+	err_code = find_command(first, entries, strdup("findS Smith"));
 	printf("find result %d %s\n\n", err_code, err_to_str(err_code));
 
-	//err_code = find_command(first, entries, strdup("findS *"));
-	//printf("find result %d %s\n\n", err_code, err_to_str(err_code));
-
-
-	err_code = print_command(first,entries,strdup("printE 51"));
+	err_code = find_command(first, entries, strdup("findS *"));
 	printf("find result %d %s\n\n", err_code, err_to_str(err_code));
 
+	err_code = print_command(first, entries, strdup("printE 51"));
+	printf("print result %d %s\n\n", err_code, err_to_str(err_code));
 
 	/* TODO print_report() doesnt display NA */
 

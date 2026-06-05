@@ -440,7 +440,7 @@ int print_command(report *first, int entries, char *command_str)
 	{
 		return ERR_INVALID_ARGS;
 	}
-	
+
 	if (strcmp(print_type, "printG") == 0)
 	{
 		void *argument_data[2];
@@ -529,6 +529,174 @@ int print_command(report *first, int entries, char *command_str)
 	else
 	{
 		return ERR_INVALID_ARGS;
+	}
+
+	return SUCCESS;
+}
+
+int load_command(report **first, report **last, int *entries, char *command_str)
+{
+	char *args[2] = {0};
+
+	args[0] = strtok(command_str, " ");
+	args[1] = strtok(NULL, " ");
+
+	if (args[0] == NULL || strcmp(args[0], "load") != 0)
+	{
+		return ERR_INVALID_COMMAND;
+	}
+
+	if (args[1] == NULL)
+	{
+		return ERR_INVALID_ARGS;
+	}
+
+	int err_code = 0;
+	char *argument = args[1];
+
+	err_code = parse_file(argument, first, last, entries);
+
+	if (err_code == SUCCESS)
+	{
+		printf("Loaded %d entries\n", *entries);
+	}
+	else
+	{
+		return err_code;
+	}
+
+	return SUCCESS;
+}
+
+int save_command(report *first, int entries, char *command_str)
+{
+	char *args[2] = {0};
+
+	args[0] = strtok(command_str, " ");
+	args[1] = strtok(NULL, " ");
+
+	if (args[0] == NULL || strcmp(args[0], "save") != 0)
+	{
+		return ERR_INVALID_COMMAND;
+	}
+
+	if (args[1] == NULL)
+	{
+		return ERR_INVALID_ARGS;
+	}
+
+	int err_code = 0;
+	char *argument = args[1];
+
+	err_code = save_to_file(argument, first, entries);
+
+	if (err_code == SUCCESS)
+	{
+		printf("Successfully saved file\n");
+	}
+	else
+	{
+		return err_code;
+	}
+
+	return SUCCESS;
+}
+
+int new_report_command(report **first, report **last, int *entries, char *command_str)
+{
+	char *args[2] = {0};
+
+	args[0] = strtok(command_str, " ");
+
+	if (args[0] == NULL || strcmp(args[0], "newReport") != 0)
+	{
+		return ERR_INVALID_COMMAND;
+	}
+
+	int err_code = 0;
+	char *argument = command_str + strlen(args[0]) + 1;
+
+	report *new_report = (report *)malloc(sizeof(report));
+	if (new_report == NULL)
+	{
+		printf("Could not allocate memory exiting program\n");
+		exit(0);
+	}
+
+	err_code = parse_report(new_report, argument, "keyb");
+
+	if (err_code != SUCCESS)
+	{
+		free(new_report);
+		return err_code;
+	}
+	else
+	{
+		add_to_list(new_report, first, last, entries);
+		printf("Successfully added report\n");
+	}
+
+	return SUCCESS;
+}
+int delete_command(report **first, report **last, int *entries, char *command_str)
+{
+
+	if (strstr(command_str, "delete") == NULL)
+	{
+		return ERR_INVALID_COMMAND;
+	}
+
+	int err_code = 0;
+
+	if (strcmp("delete", command_str) == 0)
+	{
+		char *args[2] = {0};
+
+		args[0] = strtok(command_str, " ");
+
+		args[1] = strtok(NULL, " ");
+
+		if (args[1] == NULL)
+		{
+			return ERR_INVALID_ARGS;
+		}
+		int argument = (int)strtol(args[1], NULL, 10);
+
+		err_code = delete(first, last, argument, entries);
+		if (err_code != SUCCESS)
+		{
+			return err_code;
+		}
+		else
+		{
+			printf("Successfully deleted report at index %d\n", argument);
+		}
+	}
+	else if (strcmp("deleteO", command_str) == 0)
+	{
+
+		err_code = delete(first, last, *entries, entries);
+		if (err_code != SUCCESS)
+		{
+			return err_code;
+		}
+		else
+		{
+			printf("Successfully deleted oldest report\n");
+		}
+	}
+	else if (strcmp("deleteR", command_str) == 0)
+	{
+
+		err_code = delete(first, last, 1, entries);
+		if (err_code != SUCCESS)
+		{
+			return err_code;
+		}
+		else
+		{
+			printf("Successfully deleted most recent report\n");
+		}
 	}
 
 	return SUCCESS;
@@ -673,5 +841,5 @@ int print_predicate(report *this_report, void **argument_data)
 		check2 = compare_function(this_report->felony_age, argument);
 	}
 
-	return check1 || check2 ;
+	return check1 || check2;
 }

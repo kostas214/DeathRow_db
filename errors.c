@@ -62,6 +62,9 @@ const char *err_to_str(int err)
 	case ERR_NO_MATCHES_FOUND:
 		return "No matches found";
 
+	case ERR_INDEX_NOT_FOUND:
+		return "Could not find element in list";
+
 	default:
 		return "Unknown error.";
 	}

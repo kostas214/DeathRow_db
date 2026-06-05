@@ -22,6 +22,7 @@
 #define ERR_INVALID_COMMAND -16
 #define ERR_INVALID_ARGS -17
 #define ERR_NO_MATCHES_FOUND -18
+#define ERR_INDEX_NOT_FOUND -19
 
 #define REPORT_NA -1
 

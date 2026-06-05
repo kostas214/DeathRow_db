@@ -47,7 +47,7 @@ typedef struct reportList
 int parse_report(report *Report, char *buffer, char *insert_type);			  // Check info of user input and decide whether a report should be made
 
 void add_to_list(report *input, report **first, report **last, int *entries); // Insert the report onto the list
-void delete(report **first, report **last, int index, int *entries); // fully customizable delete function
+int delete(report **first, report **last, int index, int *entries); // fully customizable delete function
 
 
 int save_to_file(char *filename, report *first, int entries);

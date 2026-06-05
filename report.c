@@ -277,12 +277,11 @@ void add_to_list(report *input, report **first, report **last, int *entries)
 	(*entries)++;
 }
 
-void delete(report **first, report **last, int index, int *entries)
+int delete(report **first, report **last, int index, int *entries)
 {
 	if (*entries == 0)
 	{
-		printf("Nothing to delete -- list is empty\n"); //"erm only chatpeetee τσατ ποιητης uses emdashes" betas when omega male emdash user:
-		return;
+		return RESULT_NO_ENTRIES;
 	}
 
 	else if (index == 1) // delete first element (deleteR)
@@ -338,7 +337,10 @@ void delete(report **first, report **last, int index, int *entries)
 		(*entries)--;
 	}
 	else
-		printf("We couldn't find what you're looking for\n");
+		//printf("We couldn't find what you're looking for\n");
+		return ERR_INDEX_NOT_FOUND;
+	
+	return SUCCESS;
 }
 
 
