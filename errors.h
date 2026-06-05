@@ -21,6 +21,7 @@
 #define RESULT_NO_ENTRIES 3
 #define ERR_INVALID_COMMAND -16
 #define ERR_INVALID_ARGS -17
+#define ERR_NO_MATCHES_FOUND -18
 
 #define REPORT_NA -1
 

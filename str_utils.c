@@ -132,3 +132,8 @@ void free_str_arr(char **array, int length)
 
     free(array);
 }
+
+char* to_lower(char* s) {
+  for(char *p=s; *p; p++) *p=tolower(*p);
+  return s;
+}

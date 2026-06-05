@@ -55,8 +55,13 @@ const char *err_to_str(int err)
 
 	case ERR_INVALID_COMMAND:
 		return "Invalid command";
+
 	case ERR_INVALID_ARGS:
-		return "Command arguments are invalid";
+		return "Command arguments are invalid or not present";
+
+	case ERR_NO_MATCHES_FOUND:
+		return "No matches found";
+
 	default:
 		return "Unknown error.";
 	}

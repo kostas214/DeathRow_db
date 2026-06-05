@@ -1,6 +1,9 @@
 #include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 
 #include "commands.h"
+#include "str_utils.h"
 
 int count_fields(report *first, int entries, int *result, int (*get_field)(report *))
 {
@@ -66,20 +69,96 @@ int average(report *first, int entries, float *result, int (*get_field)(report *
 	return SUCCESS;
 }
 
+int find(report *first, int entries, int *result, char *(*get_field)(report *), char *argument, char type) // find num of matches with argument or print every match
+{
+	/* types:
+	c = count matches
+	p = print matches
+	*/
+
+	report *tmp = first;
+	int count = 0, c = 0;
+
+	if (entries == 0)
+	{
+		*result = 0;
+		return RESULT_NO_ENTRIES;
+	}
+
+	to_lower(argument);
+
+	while (tmp->next != first)
+	{
+		char* field_str = to_lower(strdup(get_field(tmp)));
+		if (strstr(field_str, argument) != NULL)
+		{
+			count++;
+			if (type == 'c')
+				(*result)++;
+			else if (type == 'p')
+			{
+				print_report(tmp);
+
+				if (count != *result)
+					printf("\n[%d/%d]\nPress ENTER to view the next report or q to stop\n", count, *result);
+				else
+					printf("\n[%d/%d]\nPress ENTER to finish viewing reports\n", count, *result);
+
+				while ((c = getchar()) != '\n')
+				{
+					if (c == 'q')
+					{
+						while (getchar() != '\n')
+							;
+
+						free(field_str);
+						return SUCCESS;
+					}
+				}
+			}
+		}
+		free(field_str);
+		tmp = tmp->next;
+	}
+
+	char* field_str = to_lower(strdup(get_field(tmp)));
+
+	if (strstr(field_str, argument) != NULL)
+	{
+		count++;
+		if (type == 'c')
+			(*result)++;
+		else if (type == 'p')
+		{
+			print_report(tmp);
+			printf("\n[%d/%d]\nPress ENTER to finish viewing reports\n", count, *result);
+			while (getchar() != '\n')
+				;
+		}
+	}
+	free(field_str);
+
+	return SUCCESS;
+}
+
 int average_command(report *first, int entries, char *command_str)
 {
 
 	char *args[2] = {0};
 
-	args[0];
-
 	args[0] = strtok(command_str, " ");
 	args[1] = strtok(NULL, " ");
 
-	if (strcmp(args[0], "avg") != 0)
+	if (args[0] == NULL || strcmp(args[0], "avg") != 0)
 	{
 		return ERR_INVALID_COMMAND;
 	}
+
+	if (args[1] == NULL)
+	{
+		return ERR_INVALID_ARGS;
+	}
+
 	int err_code = 0;
 	char *argument = args[1];
 	float result = 0;
@@ -93,7 +172,7 @@ int average_command(report *first, int entries, char *command_str)
 		}
 		else
 		{
-			printf("%s\n", err_to_str(err_code));
+			return err_code;
 		}
 	}
 	else if (strcmp(argument, "received") == 0)
@@ -105,7 +184,7 @@ int average_command(report *first, int entries, char *command_str)
 		}
 		else
 		{
-			printf("%s\n", err_to_str(err_code));
+			return err_code;
 		}
 	}
 	else if (strcmp(argument, "education") == 0)
@@ -118,12 +197,12 @@ int average_command(report *first, int entries, char *command_str)
 		}
 		else
 		{
-			printf("%s\n", err_to_str(err_code));
+			return err_code;
 		}
 	}
 	else
 	{
-		return ERR_INVALID_COMMAND;
+		return ERR_INVALID_ARGS;
 	}
 
 	return SUCCESS;
@@ -134,14 +213,16 @@ int count_command(report *first, int entries, char *command_str)
 
 	char *args[2] = {0};
 
-	args[0];
-
 	args[0] = strtok(command_str, " ");
 	args[1] = strtok(NULL, " ");
 
-	if (strcmp(args[0], "count") != 0)
+	if (args[0] == NULL || strcmp(args[0], "count") != 0)
 	{
 		return ERR_INVALID_COMMAND;
+	}
+	if (args[1] == NULL)
+	{
+		return ERR_INVALID_ARGS;
 	}
 	int err_code = 0;
 	char *argument = args[1];
@@ -186,7 +267,138 @@ int count_command(report *first, int entries, char *command_str)
 	}
 	else
 	{
+		return ERR_INVALID_ARGS;
+	}
+
+	return SUCCESS;
+}
+
+int find_command(report *first, int entries, char *command_str)
+{
+
+	char *args[2] = {0};
+
+	args[0] = strtok(command_str, " ");
+	args[1] = strtok(NULL, " ");
+
+	if (args[0] == NULL || strstr(args[0], "find") == NULL)
+	{
 		return ERR_INVALID_COMMAND;
+	}
+
+	if (args[1] == NULL)
+	{
+		return ERR_INVALID_ARGS;
+	}
+
+	int err_code = 0;
+	char *find_type = args[0];
+	char *argument = args[1];
+	int result = 0;
+
+	// printf("%s\n", find_type);
+	// printf("%s\n", argument);
+
+	if (strcmp(find_type, "findS") == 0) // find surname
+	{
+		err_code = find(first, entries, &result, get_surname, argument, 'c');
+
+		if (err_code != SUCCESS)
+		{
+			return err_code;
+		}
+		else if (result > 0)
+		{
+			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
+			while (getchar() != '\n')
+				;
+			err_code = find(first, entries, &result, get_surname, argument, 'p');
+
+			if (err_code != SUCCESS)
+			{
+				return err_code;
+			}
+		}
+		else
+		{
+			return ERR_NO_MATCHES_FOUND;
+		}
+	}
+	else if (strcmp(find_type, "findN") == 0) // find name
+	{
+		err_code = find(first, entries, &result, get_name, argument, 'c');
+
+		if (err_code != SUCCESS)
+		{
+			return err_code;
+		}
+		else if (result > 0)
+		{
+			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
+			while (getchar() != '\n')
+				;
+			err_code = find(first, entries, &result, get_name, argument, 'p');
+			if (err_code != SUCCESS)
+			{
+				return err_code;
+			}
+		}
+		else
+		{
+			return ERR_NO_MATCHES_FOUND;
+		}
+	}
+	else if (strcmp(find_type, "findR") == 0) // find race
+	{
+		err_code = find(first, entries, &result, get_race, argument, 'c');
+
+		if (err_code != SUCCESS)
+		{
+			return err_code;
+		}
+		else if (result > 0)
+		{
+			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
+			while (getchar() != '\n')
+				;
+			err_code = find(first, entries, &result, get_race, argument, 'p');
+			if (err_code != SUCCESS)
+			{
+				return err_code;
+			}
+		}
+		else
+		{
+			return ERR_NO_MATCHES_FOUND;
+		}
+	}
+	else if (strcmp(find_type, "findF") == 0) // find final words
+	{
+		err_code = find(first, entries, &result, get_final, argument, 'c');
+
+		if (err_code != SUCCESS)
+		{
+			return err_code;
+		}
+		else if (result > 0)
+		{
+			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
+			while (getchar() != '\n')
+				;
+			err_code = find(first, entries, &result, get_final, argument, 'p');
+			if (err_code != SUCCESS)
+			{
+				return err_code;
+			}
+		}
+		else
+		{
+			return ERR_NO_MATCHES_FOUND;
+		}
+	}
+	else
+	{
+		return ERR_INVALID_ARGS;
 	}
 
 	return SUCCESS;
@@ -260,163 +472,22 @@ int get_fem_victims(report *r)
 	return r->fem_victims;
 }
 
-char* get_final(report *r)
+char *get_final(report *r)
 {
 	return r->final_words;
 }
 
-char* get_race(report *r)
+char *get_race(report *r)
 {
 	return r->race;
 }
 
-char* get_name(report *r)
+char *get_name(report *r)
 {
 	return r->name;
 }
 
-char* get_surname(report *r)
+char *get_surname(report *r)
 {
 	return r->surname;
-}
-
-
-
-
-int find(report *first, int entries, int *result, char* (*get_field)(report *), char* argument ,char type) //find num of matches with argument or print every match
-{
-	/* types:
-	c = count matches
-	p = print matches
-	*/
-
-	report *tmp = first;
-	int count = 0;
-
-	if (entries == 0)
-	{
-		*result = 0;
-		return RESULT_NO_ENTRIES;
-	}
-
-	while (tmp->next != first)
-	{
-		if (strstr(get_field(tmp), argument) != NULL)
-		{
-			count++;
-			if (type == 'c')
-				(*result)++;
-			else if (type == 'p')
-			{
-				print_report(tmp);
-				
-				if (count != *result)
-					printf("\n[%d/%d]\nPress ENTER to view the next report\n", count, *result);
-				else
-					printf("\n[%d/%d]\nPress ENTER to finish viewing reports\n", count, *result);
-					
-				while(getchar() != '\n');
-			}
-		}
-		tmp = tmp->next;
-	}
-	
-	if (strstr(get_field(tmp), argument) != NULL)
-	{
-		count++;
-		if (type == 'c')
-			(*result)++;
-		else if (type == 'p')
-		{
-			print_report(tmp);
-			printf("\n[%d/%d]\nPress ENTER to finish viewing reports\n", count, *result);
-			while(getchar() != '\n');
-		}
-	}
-	
-	return SUCCESS;
-}
-
-int find_command(report *first, int entries, char *command_str)
-{
-
-	char *args[2] = {0};
-
-	args[0] = strtok(command_str, " ");
-	args[1] = strtok(NULL, " ");
-
-	int err_code = 0;
-	char *find_type = args[0];
-	char *argument = args[1];
-	int result = 0;
-	
-	//printf("%s\n", find_type);
-	//printf("%s\n", argument);
-	
-	if (strcmp(find_type, "findS") == 0) //find surname
-	{
-		err_code = find(first, entries, &result, get_surname, argument, 'c');
-
-		if (err_code == SUCCESS && result > 0)
-		{
-			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
-			while(getchar() != '\n');
-			err_code = find(first, entries, &result, get_surname, argument, 'p');
-		}
-		else
-		{
-			printf("No matches found\n");
-		}
-	}
-	else if (strcmp(find_type, "findN") == 0) //find name
-	{
-		err_code = find(first, entries, &result, get_name, argument, 'c');
-
-		if (err_code == SUCCESS && result > 0)
-		{
-			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
-			while(getchar() != '\n');
-			err_code = find(first, entries, &result, get_name, argument, 'p');
-		}
-		else
-		{
-			printf("No matches found\n");
-		}
-	}
-	else if (strcmp(find_type, "findR") == 0) //find race
-	{
-		err_code = find(first, entries, &result, get_race, argument, 'c');
-
-		if (err_code == SUCCESS && result > 0)
-		{
-			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
-			while(getchar() != '\n');
-			err_code = find(first, entries, &result, get_race, argument, 'p');
-		}
-		else
-		{
-			printf("No matches found\n");
-		}
-	}
-	else if (strcmp(find_type, "findF") == 0) //find final words
-	{
-		err_code = find(first, entries, &result, get_final, argument, 'c');
-
-		if (err_code == SUCCESS && result > 0)
-		{
-			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
-			while(getchar() != '\n');
-			err_code = find(first, entries, &result, get_final, argument, 'p');
-		}
-		else
-		{
-			printf("No matches found\n");
-		}
-	}
-	else
-	{
-		return ERR_INVALID_COMMAND;
-	}
-
-	return SUCCESS;
 }
