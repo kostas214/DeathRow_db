@@ -10,7 +10,6 @@
 int parse_report(report *Report, char *buffer, char *insert_type)
 {
 
-	int i, j;
 	int err = SUCCESS;
 
 	// extract values from buffer
@@ -328,7 +327,6 @@ void delete(report **first, report **last, int index, int *entries)
 	}
 	else if (0 < index && index < *entries) // delete anything thats not the first or last element
 	{
-		int i;
 		report *tmp = *first;
 		report *tmp2;
 		for (int i = 1; i < index - 1; i++) // stop at the previous element of the one we wanna delete
@@ -528,7 +526,6 @@ int parse_file(char *filename, report **first, report **last, int *entries)
 
 	err = SUCCESS;
 
-cleanup:
 	fclose(fp);
 	return err;
 }

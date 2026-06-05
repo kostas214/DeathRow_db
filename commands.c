@@ -50,7 +50,6 @@ int average(report *first, int entries, float *result, int (*get_field)(report *
 	e = education
 	*/
 
-	report *tmp = first;
 	int count = 0;
 
 	if (entries == 0)
@@ -69,7 +68,7 @@ int average(report *first, int entries, float *result, int (*get_field)(report *
 	return SUCCESS;
 }
 
-int find(report *first, int entries, int *result, char *(*get_field)(report *), char *argument, char type) // find num of matches with argument or print every match
+int find(report *first, int entries, int *result, int (*predicate)(report *, void **argument_data), void **argument_data, char type) // find num of matches with argument or print every match
 {
 	/* types:
 	c = count matches
@@ -85,12 +84,9 @@ int find(report *first, int entries, int *result, char *(*get_field)(report *), 
 		return RESULT_NO_ENTRIES;
 	}
 
-	to_lower(argument);
-
 	while (tmp->next != first)
 	{
-		char* field_str = to_lower(strdup(get_field(tmp)));
-		if (strstr(field_str, argument) != NULL)
+		if (predicate(tmp, argument_data))
 		{
 			count++;
 			if (type == 'c')
@@ -111,19 +107,15 @@ int find(report *first, int entries, int *result, char *(*get_field)(report *), 
 						while (getchar() != '\n')
 							;
 
-						free(field_str);
 						return SUCCESS;
 					}
 				}
 			}
 		}
-		free(field_str);
 		tmp = tmp->next;
 	}
 
-	char* field_str = to_lower(strdup(get_field(tmp)));
-
-	if (strstr(field_str, argument) != NULL)
+	if (predicate(tmp, argument_data))
 	{
 		count++;
 		if (type == 'c')
@@ -136,8 +128,6 @@ int find(report *first, int entries, int *result, char *(*get_field)(report *), 
 				;
 		}
 	}
-	free(field_str);
-
 	return SUCCESS;
 }
 
@@ -301,7 +291,12 @@ int find_command(report *first, int entries, char *command_str)
 
 	if (strcmp(find_type, "findS") == 0) // find surname
 	{
-		err_code = find(first, entries, &result, get_surname, argument, 'c');
+		void *argument_data[2];
+
+		argument_data[0] = get_surname;
+		argument_data[1] = to_lower(argument);
+
+		err_code = find(first, entries, &result, find_predicate, argument_data, 'c');
 
 		if (err_code != SUCCESS)
 		{
@@ -312,7 +307,7 @@ int find_command(report *first, int entries, char *command_str)
 			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
 			while (getchar() != '\n')
 				;
-			err_code = find(first, entries, &result, get_surname, argument, 'p');
+			err_code = find(first, entries, &result, find_predicate, argument_data, 'p');
 
 			if (err_code != SUCCESS)
 			{
@@ -326,7 +321,12 @@ int find_command(report *first, int entries, char *command_str)
 	}
 	else if (strcmp(find_type, "findN") == 0) // find name
 	{
-		err_code = find(first, entries, &result, get_name, argument, 'c');
+		void *argument_data[2];
+
+		argument_data[0] = get_name;
+		argument_data[1] = to_lower(argument);
+
+		err_code = find(first, entries, &result, find_predicate, argument_data, 'c');
 
 		if (err_code != SUCCESS)
 		{
@@ -337,7 +337,7 @@ int find_command(report *first, int entries, char *command_str)
 			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
 			while (getchar() != '\n')
 				;
-			err_code = find(first, entries, &result, get_name, argument, 'p');
+			err_code = find(first, entries, &result, find_predicate, argument_data, 'p');
 			if (err_code != SUCCESS)
 			{
 				return err_code;
@@ -350,7 +350,12 @@ int find_command(report *first, int entries, char *command_str)
 	}
 	else if (strcmp(find_type, "findR") == 0) // find race
 	{
-		err_code = find(first, entries, &result, get_race, argument, 'c');
+		void *argument_data[2];
+
+		argument_data[0] = get_race;
+		argument_data[1] = to_lower(argument);
+
+		err_code = find(first, entries, &result, find_predicate, argument_data, 'c');
 
 		if (err_code != SUCCESS)
 		{
@@ -361,7 +366,7 @@ int find_command(report *first, int entries, char *command_str)
 			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
 			while (getchar() != '\n')
 				;
-			err_code = find(first, entries, &result, get_race, argument, 'p');
+			err_code = find(first, entries, &result, find_predicate, argument_data, 'p');
 			if (err_code != SUCCESS)
 			{
 				return err_code;
@@ -374,7 +379,12 @@ int find_command(report *first, int entries, char *command_str)
 	}
 	else if (strcmp(find_type, "findF") == 0) // find final words
 	{
-		err_code = find(first, entries, &result, get_final, argument, 'c');
+		void *argument_data[2];
+
+		argument_data[0] = get_final;
+		argument_data[1] = to_lower(argument);
+
+		err_code = find(first, entries, &result, find_predicate, argument_data, 'c');
 
 		if (err_code != SUCCESS)
 		{
@@ -385,7 +395,7 @@ int find_command(report *first, int entries, char *command_str)
 			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
 			while (getchar() != '\n')
 				;
-			err_code = find(first, entries, &result, get_final, argument, 'p');
+			err_code = find(first, entries, &result, find_predicate, argument_data, 'p');
 			if (err_code != SUCCESS)
 			{
 				return err_code;
@@ -396,6 +406,126 @@ int find_command(report *first, int entries, char *command_str)
 			return ERR_NO_MATCHES_FOUND;
 		}
 	}
+	else
+	{
+		return ERR_INVALID_ARGS;
+	}
+
+	return SUCCESS;
+}
+
+int print_command(report *first, int entries, char *command_str)
+{
+	char *args[2] = {0};
+
+	args[0] = strtok(command_str, " ");
+	args[1] = strtok(NULL, " ");
+
+	if (args[0] == NULL || strstr(args[0], "print") == NULL)
+	{
+		return ERR_INVALID_COMMAND;
+	}
+
+	if (args[1] == NULL)
+	{
+		return ERR_INVALID_ARGS;
+	}
+
+	int err_code = 0;
+	char *print_type = args[0];
+	int num_argument = (int)strtol(args[1], NULL, 10);
+	int result = 0;
+
+	if (num_argument == 0)
+	{
+		return ERR_INVALID_ARGS;
+	}
+	
+	if (strcmp(print_type, "printG") == 0)
+	{
+		void *argument_data[2];
+
+		argument_data[0] = compare_greater;
+		argument_data[1] = &num_argument;
+		err_code = find(first, entries, &result, print_predicate, argument_data, 'c');
+
+		if (err_code != SUCCESS)
+		{
+			return err_code;
+		}
+		else if (result > 0)
+		{
+			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
+			while (getchar() != '\n')
+				;
+			err_code = find(first, entries, &result, print_predicate, argument_data, 'p');
+			if (err_code != SUCCESS)
+			{
+				return err_code;
+			}
+		}
+		else
+		{
+			return ERR_NO_MATCHES_FOUND;
+		}
+	}
+	else if (strcmp(print_type, "printL") == 0)
+	{
+		void *argument_data[2];
+
+		argument_data[0] = compare_lower;
+		argument_data[1] = &num_argument;
+		err_code = find(first, entries, &result, print_predicate, argument_data, 'c');
+
+		if (err_code != SUCCESS)
+		{
+			return err_code;
+		}
+		else if (result > 0)
+		{
+			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
+			while (getchar() != '\n')
+				;
+			err_code = find(first, entries, &result, print_predicate, argument_data, 'p');
+			if (err_code != SUCCESS)
+			{
+				return err_code;
+			}
+		}
+		else
+		{
+			return ERR_NO_MATCHES_FOUND;
+		}
+	}
+	else if (strcmp(print_type, "printE") == 0)
+	{
+		void *argument_data[2];
+
+		argument_data[0] = compare_equal;
+		argument_data[1] = &num_argument;
+		err_code = find(first, entries, &result, print_predicate, argument_data, 'c');
+
+		if (err_code != SUCCESS)
+		{
+			return err_code;
+		}
+		else if (result > 0)
+		{
+			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
+			while (getchar() != '\n')
+				;
+			err_code = find(first, entries, &result, print_predicate, argument_data, 'p');
+			if (err_code != SUCCESS)
+			{
+				return err_code;
+			}
+		}
+		else
+		{
+			return ERR_NO_MATCHES_FOUND;
+		}
+	}
+
 	else
 	{
 		return ERR_INVALID_ARGS;
@@ -490,4 +620,58 @@ char *get_name(report *r)
 char *get_surname(report *r)
 {
 	return r->surname;
+}
+
+int compare_greater(int age, int argument)
+{
+	return age > argument;
+}
+int compare_lower(int age, int argument)
+{
+	return age < argument;
+}
+int compare_equal(int age, int argument)
+{
+	return age == argument;
+}
+
+int find_predicate(report *this_report, void **argument_data)
+{
+	// get_fied is at 0
+
+	char *(*get_field)(report *r) = (char *(*)(report * r)) argument_data[0];
+
+	// search str is at 1
+
+	char *argument = (char *)argument_data[1];
+
+	char *field_str = to_lower(strdup(get_field(this_report)));
+
+	int result = argument[0] == '*' || strstr(field_str, argument) != NULL;
+
+	free(field_str);
+	return result;
+}
+
+int print_predicate(report *this_report, void **argument_data)
+{
+	// compare function is at 0
+	int (*compare_function)(int age, int argument) = (int (*)(int age, int argument))argument_data[0];
+
+	int argument = *((int *)argument_data[1]);
+
+	int check1 = 0;
+	int check2 = 0;
+
+	if (this_report->age != REPORT_NA)
+	{
+		check1 = compare_function(this_report->age, argument);
+	}
+
+	if (this_report->felony_age != REPORT_NA)
+	{
+		check2 = compare_function(this_report->felony_age, argument);
+	}
+
+	return check1 || check2 ;
 }

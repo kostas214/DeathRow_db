@@ -11,8 +11,12 @@ int count_fields(report *first, int entries, int *result, int (*get_field)(repor
 void print_report(report *report);
 int average_command(report *first,int entries ,char *command_str);
 int count_command(report *first,int entries ,char *command_str);
-int find(report *first, int entries, int *result, char* (*get_field)(report *), char* argument ,char type);
+int find(report *first, int entries, int *result, int (*predicate)(report*,void** argument_data) , void **argument_data, char type);
 int find_command(report *first, int entries, char *command_str);
+int print_command(report *first ,int entries,char *command_str);
+
+int find_predicate(report *this_report, void **argument_data);
+int print_predicate(report *this_report, void **argument_data);
 
 int get_age(report *r);
 int get_felony_age(report *r);
@@ -24,5 +28,11 @@ char* get_final(report *r);
 char* get_race(report *r);
 char* get_name(report *r);
 char* get_surname(report *r);
+
+int compare_greater(int age,int argument);
+int compare_lower(int age,int argument);
+int compare_equal(int age,int argument);
+
+
 
 #endif
