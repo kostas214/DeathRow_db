@@ -10,4 +10,6 @@ int count_char(const char* buffer,char target_char);
 
 void free_str_arr(char** array,int length);
 char* to_lower(char* s);
+int starts_with(const char *str, const char *prefix);
+
 #endif

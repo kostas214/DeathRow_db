@@ -137,3 +137,7 @@ char* to_lower(char* s) {
   for(char *p=s; *p; p++) *p=tolower(*p);
   return s;
 }
+
+int starts_with(const char *str, const char *prefix) {
+    return strncmp(str, prefix, strlen(prefix)) == 0;
+}

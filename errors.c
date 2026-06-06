@@ -59,11 +59,14 @@ const char *err_to_str(int err)
 	case ERR_INVALID_ARGS:
 		return "Command arguments are invalid or not present";
 
-	case ERR_NO_MATCHES_FOUND:
+	case ERR_MATCHES_NOT_FOUND:
 		return "No matches found";
 
 	case ERR_INDEX_NOT_FOUND:
 		return "Could not find element in list";
+
+	case ERR_COMMAND_NOT_FOUND:
+		return "Command not found";
 
 	default:
 		return "Unknown error.";

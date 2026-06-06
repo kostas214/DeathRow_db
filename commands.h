@@ -18,6 +18,9 @@ int load_command(report **first, report **last, int *entries, char *command_str)
 int save_command(report *first,int entries, char *command_str);
 int new_report_command(report**first ,report **last,int* entries,char* command_str);
 int delete_command(report**first,report**last,int*entries,char* command_str);
+int reverse_print_command(report* first,int entries,char *command_str);
+int help_command(char *command_str);
+
 
 int find_predicate(report *this_report, void **argument_data);
 int print_predicate(report *this_report, void **argument_data);
