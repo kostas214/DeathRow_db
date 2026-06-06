@@ -288,127 +288,56 @@ int find_command(report *first, int entries, char *command_str)
 
 	// printf("%s\n", find_type);
 	// printf("%s\n", argument);
-
+	void *argument_data[2];
 	if (strcmp(find_type, "findS") == 0) // find surname
 	{
-		void *argument_data[2];
 
 		argument_data[0] = get_surname;
 		argument_data[1] = to_lower(argument);
-
-		err_code = find(first, entries, &result, find_predicate, argument_data, 'c');
-
-		if (err_code != SUCCESS)
-		{
-			return err_code;
-		}
-		else if (result > 0)
-		{
-			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
-			while (getchar() != '\n')
-				;
-			err_code = find(first, entries, &result, find_predicate, argument_data, 'p');
-
-			if (err_code != SUCCESS)
-			{
-				return err_code;
-			}
-		}
-		else
-		{
-			return ERR_NO_MATCHES_FOUND;
-		}
 	}
 	else if (strcmp(find_type, "findN") == 0) // find name
 	{
-		void *argument_data[2];
 
 		argument_data[0] = get_name;
 		argument_data[1] = to_lower(argument);
-
-		err_code = find(first, entries, &result, find_predicate, argument_data, 'c');
-
-		if (err_code != SUCCESS)
-		{
-			return err_code;
-		}
-		else if (result > 0)
-		{
-			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
-			while (getchar() != '\n')
-				;
-			err_code = find(first, entries, &result, find_predicate, argument_data, 'p');
-			if (err_code != SUCCESS)
-			{
-				return err_code;
-			}
-		}
-		else
-		{
-			return ERR_NO_MATCHES_FOUND;
-		}
 	}
 	else if (strcmp(find_type, "findR") == 0) // find race
 	{
-		void *argument_data[2];
-
 		argument_data[0] = get_race;
 		argument_data[1] = to_lower(argument);
-
-		err_code = find(first, entries, &result, find_predicate, argument_data, 'c');
-
-		if (err_code != SUCCESS)
-		{
-			return err_code;
-		}
-		else if (result > 0)
-		{
-			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
-			while (getchar() != '\n')
-				;
-			err_code = find(first, entries, &result, find_predicate, argument_data, 'p');
-			if (err_code != SUCCESS)
-			{
-				return err_code;
-			}
-		}
-		else
-		{
-			return ERR_NO_MATCHES_FOUND;
-		}
 	}
 	else if (strcmp(find_type, "findF") == 0) // find final words
 	{
-		void *argument_data[2];
 
 		argument_data[0] = get_final;
 		argument_data[1] = to_lower(argument);
-
-		err_code = find(first, entries, &result, find_predicate, argument_data, 'c');
-
-		if (err_code != SUCCESS)
-		{
-			return err_code;
-		}
-		else if (result > 0)
-		{
-			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
-			while (getchar() != '\n')
-				;
-			err_code = find(first, entries, &result, find_predicate, argument_data, 'p');
-			if (err_code != SUCCESS)
-			{
-				return err_code;
-			}
-		}
-		else
-		{
-			return ERR_NO_MATCHES_FOUND;
-		}
 	}
 	else
 	{
 		return ERR_INVALID_ARGS;
+	}
+
+	err_code = find(first, entries, &result, find_predicate, argument_data, 'c');
+
+	if (err_code != SUCCESS)
+	{
+		return err_code;
+	}
+	else if (result > 0)
+	{
+		printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
+		while (getchar() != '\n')
+			;
+		err_code = find(first, entries, &result, find_predicate, argument_data, 'p');
+
+		if (err_code != SUCCESS)
+		{
+			return err_code;
+		}
+	}
+	else
+	{
+		return ERR_NO_MATCHES_FOUND;
 	}
 
 	return SUCCESS;
@@ -440,95 +369,48 @@ int print_command(report *first, int entries, char *command_str)
 	{
 		return ERR_INVALID_ARGS;
 	}
+	void *argument_data[2];
 
 	if (strcmp(print_type, "printG") == 0)
 	{
-		void *argument_data[2];
-
 		argument_data[0] = compare_greater;
 		argument_data[1] = &num_argument;
-		err_code = find(first, entries, &result, print_predicate, argument_data, 'c');
-
-		if (err_code != SUCCESS)
-		{
-			return err_code;
-		}
-		else if (result > 0)
-		{
-			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
-			while (getchar() != '\n')
-				;
-			err_code = find(first, entries, &result, print_predicate, argument_data, 'p');
-			if (err_code != SUCCESS)
-			{
-				return err_code;
-			}
-		}
-		else
-		{
-			return ERR_NO_MATCHES_FOUND;
-		}
 	}
 	else if (strcmp(print_type, "printL") == 0)
 	{
-		void *argument_data[2];
-
 		argument_data[0] = compare_lower;
 		argument_data[1] = &num_argument;
-		err_code = find(first, entries, &result, print_predicate, argument_data, 'c');
-
-		if (err_code != SUCCESS)
-		{
-			return err_code;
-		}
-		else if (result > 0)
-		{
-			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
-			while (getchar() != '\n')
-				;
-			err_code = find(first, entries, &result, print_predicate, argument_data, 'p');
-			if (err_code != SUCCESS)
-			{
-				return err_code;
-			}
-		}
-		else
-		{
-			return ERR_NO_MATCHES_FOUND;
-		}
 	}
 	else if (strcmp(print_type, "printE") == 0)
 	{
-		void *argument_data[2];
-
 		argument_data[0] = compare_equal;
 		argument_data[1] = &num_argument;
-		err_code = find(first, entries, &result, print_predicate, argument_data, 'c');
+	}
+	else
+	{
+		return ERR_INVALID_ARGS;
+	}
 
+	err_code = find(first, entries, &result, print_predicate, argument_data, 'c');
+
+	if (err_code != SUCCESS)
+	{
+		return err_code;
+	}
+	else if (result > 0)
+	{
+		printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
+		while (getchar() != '\n')
+			;
+		err_code = find(first, entries, &result, print_predicate, argument_data, 'p');
 		if (err_code != SUCCESS)
 		{
 			return err_code;
 		}
-		else if (result > 0)
-		{
-			printf("\n[%d matches found]\nPress ENTER to cycle through results\n", result);
-			while (getchar() != '\n')
-				;
-			err_code = find(first, entries, &result, print_predicate, argument_data, 'p');
-			if (err_code != SUCCESS)
-			{
-				return err_code;
-			}
-		}
-		else
-		{
-			return ERR_NO_MATCHES_FOUND;
-		}
 	}
-
 	else
 	{
-		return ERR_INVALID_ARGS;
+		return ERR_NO_MATCHES_FOUND;
 	}
 
 	return SUCCESS;
