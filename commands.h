@@ -21,6 +21,7 @@ int delete_command(report**first,report**last,int*entries,char* command_str);
 
 int find_predicate(report *this_report, void **argument_data);
 int print_predicate(report *this_report, void **argument_data);
+int print_reverse(report* first, int entries, int count);
 
 int get_age(report *r);
 int get_felony_age(report *r);

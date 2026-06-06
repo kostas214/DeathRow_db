@@ -605,17 +605,37 @@ void print_report(report *r)
 		   r->name ? r->name : "(null)",
 		   r->surname ? r->surname : "(null)");
 
-	printf("Age: %d\n", r->age);
+	if (r->age != REPORT_NA)
+		printf("Age: %d\n", r->age);
+	else
+		printf("Age: NA\n");
 	printf("Race: %s\n", r->race ? r->race : "(null)");
 	printf("City: %s\n", r->city ? r->city : "(null)");
 
-	printf("Felony age: %d\n", r->felony_age);
-	printf("Education: %d\n", r->education);
+	if (r->felony_age != REPORT_NA)
+		printf("Felony age: %d\n", r->felony_age);
+	else
+		printf("Felony age: NA\n");
+		
+	if (r->education != REPORT_NA)
+		printf("Education: %d\n", r->education);
+	else
+		printf("Education: NA\n");
 
-	printf("Victims (total/male/female): %d / %d / %d\n",
-		   r->num_victims,
-		   r->male_victims,
-		   r->fem_victims);
+	if (r->num_victims != REPORT_NA)
+		printf("Victims (total/male/female): %d / ", r->num_victims);
+	else
+		printf("Victims (total/male/female): NA / ");
+		
+	if (r->male_victims != REPORT_NA)
+		printf("%d / ", r->male_victims);
+	else
+		printf("NA / ");
+	
+	if (r->fem_victims != REPORT_NA)
+		printf("%d\n", r->fem_victims);
+	else
+		printf("NA\n");
 
 	printf("Final words: %s\n",
 		   r->final_words ? r->final_words : "(null)");
@@ -724,4 +744,55 @@ int print_predicate(report *this_report, void **argument_data)
 	}
 
 	return check1 || check2;
+}
+
+int print_reverse(report* first, int entries, int count) //bonus function
+{
+	
+	char c;
+	int flag;
+	
+	if (entries == 0)
+	{
+		return RESULT_NO_ENTRIES;
+	}
+	
+	report* tmp = first;
+	if (count > 0)
+	{
+		flag = print_reverse(tmp->next, entries, count-1);
+		
+		if (flag != SUCCESS)
+		{
+			print_report(tmp);
+		
+			if (count < entries)
+				printf("\n[%d/%d]\nPress ENTER to view the next report or q to stop\n", count, entries);
+			else
+				printf("\n[%d/%d]\nPress ENTER to finish viewing reports\n", count, entries);
+			
+			while ((c = getchar()) != '\n')
+			{
+				if (c == 'q')
+				{
+					while (getchar() != '\n')
+						;
+
+					return SUCCESS;
+				}
+			}
+		
+			if (count == entries)
+				return SUCCESS;
+		}
+		else
+			return SUCCESS;
+	}
+	else
+	{
+		printf("[%d entries]\nPress ENTER to cycle through the reports\n", entries);
+		while (getchar() != '\n')
+			;
+	}
+	return 420;
 }

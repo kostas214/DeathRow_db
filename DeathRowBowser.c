@@ -38,22 +38,25 @@ int main(void)
 	err_code = count_command(first, entries, strdup("count men"));
 	printf("count result %d %s\n\n", err_code, err_to_str(err_code));
 
-	err_code = find_command(first, entries, strdup("findF pain"));
+	//err_code = find_command(first, entries, strdup("findF pain"));
 	printf("find result %d %s\n\n", err_code, err_to_str(err_code));
 
-	err_code = find_command(first, entries, strdup("findR black"));
+	//err_code = find_command(first, entries, strdup("findR black"));
 	printf("find result %d %s\n\n", err_code, err_to_str(err_code));
 
-	err_code = find_command(first, entries, strdup("findN John"));
+	//err_code = find_command(first, entries, strdup("findN John"));
 	printf("find result %d %s\n\n", err_code, err_to_str(err_code));
 
-	err_code = find_command(first, entries, strdup("findS Smith"));
+	//err_code = find_command(first, entries, strdup("findS Smith"));
 	printf("find result %d %s\n\n", err_code, err_to_str(err_code));
 
-	err_code = find_command(first, entries, strdup("findS *"));
+	//err_code = find_command(first, entries, strdup("findS *"));
 	printf("find result %d %s\n\n", err_code, err_to_str(err_code));
 
-	err_code = print_command(first, entries, strdup("printE 51"));
+	//err_code = print_command(first, entries, strdup("printE 30"));
+	printf("print result %d %s\n\n", err_code, err_to_str(err_code));
+	
+	err_code = print_reverse(first, entries, entries);
 	printf("print result %d %s\n\n", err_code, err_to_str(err_code));
 
 	/* TODO print_report() doesnt display NA */
