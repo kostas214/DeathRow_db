@@ -36,6 +36,7 @@ char *get_final(report *r);
 char *get_race(report *r);
 char *get_name(report *r);
 char *get_surname(report *r);
+char *get_city(report *r);
 
 int compare_greater(int age, int argument);
 int compare_lower(int age, int argument);
