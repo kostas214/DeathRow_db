@@ -364,7 +364,8 @@ int save_to_file(char *filename, report *first, int entries)
 	while (tmp->next != first)
 	{
 		fprintf(file, "[%d/%d/%d @ ", tmp->date_added.day, tmp->date_added.month, tmp->date_added.year);
-		fprintf(file, "%02d:%02d:%02d] ", tmp->time_added.hour, tmp->time_added.minutes, tmp->time_added.seconds);
+		fprintf(file, "%02d:%02d:%02d (", tmp->time_added.hour, tmp->time_added.minutes, tmp->time_added.seconds);
+		fprintf(file, "%s)] ", tmp->insert_type);
 
 		fprintf(file, "%s;", tmp->surname);
 		fprintf(file, "%s;", tmp->name);
@@ -418,7 +419,8 @@ int save_to_file(char *filename, report *first, int entries)
 	}
 
 	fprintf(file, "[%d/%d/%d @ ", tmp->date_added.day, tmp->date_added.month, tmp->date_added.year);
-	fprintf(file, "%02d:%02d:%02d] ", tmp->time_added.hour, tmp->time_added.minutes, tmp->time_added.seconds);
+	fprintf(file, "%02d:%02d:%02d (", tmp->time_added.hour, tmp->time_added.minutes, tmp->time_added.seconds);
+	fprintf(file, "%s)] ", tmp->insert_type);
 
 	fprintf(file, "%s;", tmp->surname);
 	fprintf(file, "%s;", tmp->name);
@@ -559,4 +561,3 @@ int get_len_line(FILE *fp)
 
 	return count;
 }
-
