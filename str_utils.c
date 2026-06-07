@@ -76,30 +76,38 @@ char **split_str(char *buffer, char split_char, int *split_len)
             split_arr[i] = NULL;
         }
         else if (
-            //Check if it starts with " means it can have ; inside
-            split_str[0] == '\"'
-            && 
-            //Check if its the last words field
-            i == 10
-            && 
-            //Check if it actually has more semicolons
-            field_count > 11
-        )
+            // Check if it starts with " means it can have ; inside
+            split_str[0] == '\"' &&
+            // Check if its the last words field
+            i == 10 &&
+            // Check if it actually has more semicolons
+            field_count > 11)
         {
-            //undo strtok
+            // undo strtok
             split_str[strlen(split_str)] = ';';
             split_arr[i] = strdup(split_str);
+
+            if (split_arr[i] == NULL)
+            {
+                printf("Memory allocation failed\n");
+                exit(0);
+            }
+
             break;
         }
         else if (
-            //check if there is a next string in the buffer
-            buffer_end > split_str + strlen(split_str) + 1
-            &&
-            //check if the next string is empty (;;)
+            // check if there is a next string in the buffer
+            buffer_end > split_str + strlen(split_str) + 1 &&
+            // check if the next string is empty (;;)
             *(split_str + strlen(split_str) + 1) == split_char)
         {
-            printf("%d %d %d\n", i, i + 1, field_count);
             split_arr[i] = strdup(split_str);
+            if (split_arr[i] == NULL)
+            {
+                printf("Memory allocation failed\n");
+                exit(0);
+            }
+
             split_arr[++i] = NULL;
             continue;
         }
@@ -133,11 +141,14 @@ void free_str_arr(char **array, int length)
     free(array);
 }
 
-char* to_lower(char* s) {
-  for(char *p=s; *p; p++) *p=tolower(*p);
-  return s;
+char *to_lower(char *s)
+{
+    for (char *p = s; *p; p++)
+        *p = tolower(*p);
+    return s;
 }
 
-int starts_with(const char *str, const char *prefix) {
+int starts_with(const char *str, const char *prefix)
+{
     return strncmp(str, prefix, strlen(prefix)) == 0;
 }

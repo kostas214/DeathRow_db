@@ -224,16 +224,42 @@ int parse_report(report *Report, char *buffer, char *insert_type)
 
 	// Fill report
 	Report->surname = strdup(surname);
+	if (Report->surname == NULL)
+	{
+		printf("Memory allocation failed\n");
+		exit(0);
+	}
+
 	Report->name = strdup(name);
+	if (Report->name == NULL)
+	{
+		printf("Memory allocation failed\n");
+		exit(0);
+	}
 	Report->age = age;
 	Report->race = strdup(race);
+	if (Report->race == NULL)
+	{
+		printf("Memory allocation failed\n");
+		exit(0);
+	}
 	Report->city = strdup(city);
+	if (Report->city == NULL)
+	{
+		printf("Memory allocation failed\n");
+		exit(0);
+	}
 	Report->felony_age = felony_age;
 	Report->education = education;
 	Report->male_victims = male_victims;
 	Report->fem_victims = fem_victims;
 	Report->num_victims = num_victims;
 	Report->final_words = strdup(final_words);
+	if (Report->final_words == NULL)
+	{
+		printf("Memory allocation failed\n");
+		exit(0);
+	}
 
 	strcpy(Report->insert_type, insert_type);
 
@@ -337,12 +363,11 @@ int delete(report **first, report **last, int index, int *entries)
 		(*entries)--;
 	}
 	else
-		//printf("We couldn't find what you're looking for\n");
+		// printf("We couldn't find what you're looking for\n");
 		return ERR_INDEX_NOT_FOUND;
-	
+
 	return SUCCESS;
 }
-
 
 int save_to_file(char *filename, report *first, int entries)
 {

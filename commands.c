@@ -891,11 +891,19 @@ int find_predicate(report *this_report, void **argument_data)
 
 	char *argument = (char *)argument_data[1];
 
-	char *field_str = to_lower(strdup(get_field(this_report)));
+	char* tmp = strdup(get_field(this_report));
+
+	if (tmp == NULL)
+	{
+		printf("Memory allocatin failed\n");
+		exit(0);
+	}
+
+	char *field_str = to_lower(tmp);
 
 	int result = argument[0] == '*' || strstr(field_str, argument) != NULL;
 
-	free(field_str);
+	free(tmp);
 	return result;
 }
 
