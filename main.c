@@ -1,3 +1,14 @@
+/* 
+
+ Skernti Ntisani
+ AM: 2022202500108
+ dit25108@go.uop.gr
+ 
+ Kostantinos Doukas
+ AM: 2022202500036
+ dit25036@go.uop.gr
+
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
