@@ -381,6 +381,12 @@ int find_command(report *first, int entries, char *command_str)
 		argument_data[0] = get_final;
 		argument_data[1] = to_lower(argument);
 	}
+	else if (strcmp(find_type, "findC") == 0) // find city
+	{
+
+		argument_data[0] = get_city;
+		argument_data[1] = to_lower(argument);
+	}
 	else
 	{
 		return ERR_INVALID_ARGS;
@@ -591,7 +597,7 @@ int new_report_command(report **first, report **last, int *entries, char *comman
 }
 int delete_command(report **first, report **last, int *entries, char *command_str)
 {
-
+	//printf("%s", command_str);
 	if (strstr(command_str, "delete") == NULL)
 	{
 		return ERR_INVALID_COMMAND;
@@ -599,8 +605,10 @@ int delete_command(report **first, report **last, int *entries, char *command_st
 
 	int err_code = 0;
 
-	if (strcmp("delete", command_str) == 0)
+	//printf("test1\n");
+	if (strstr(command_str, "delete ") != NULL)
 	{
+		//printf("test2\n");
 		char *args[2] = {0};
 
 		args[0] = strtok(command_str, " ");
@@ -613,6 +621,7 @@ int delete_command(report **first, report **last, int *entries, char *command_st
 		}
 		int argument = (int)strtol(args[1], NULL, 10);
 
+		//printf("%d",argument);
 		err_code = delete(first, last, argument, entries);
 		if (err_code != SUCCESS)
 		{
@@ -626,7 +635,7 @@ int delete_command(report **first, report **last, int *entries, char *command_st
 	else if (strcmp("deleteO", command_str) == 0)
 	{
 
-		err_code = delete(first, last, *entries, entries);
+		err_code = delete(first, last, 1, entries);
 		if (err_code != SUCCESS)
 		{
 			return err_code;
@@ -639,7 +648,7 @@ int delete_command(report **first, report **last, int *entries, char *command_st
 	else if (strcmp("deleteR", command_str) == 0)
 	{
 
-		err_code = delete(first, last, 1, entries);
+		err_code = delete(first, last, *entries, entries);
 		if (err_code != SUCCESS)
 		{
 			return err_code;
@@ -649,6 +658,8 @@ int delete_command(report **first, report **last, int *entries, char *command_st
 			printf("Successfully deleted most recent report\n");
 		}
 	}
+	else
+		return ERR_INVALID_COMMAND;
 
 	return SUCCESS;
 }
@@ -696,7 +707,7 @@ int help_command(char *command_str)
 	}
 	if (strcmp(args[1], "find") == 0 || flag)
 	{
-		printf("Find command details\nusage: findS {str} explanation: prints reports that have {str} inside their surname\nusage: findN {str} explanation: prints reports that have {str} inside their name\nusage: findR {str} explanation: prints reports that have {str} inside their race\nusage: findF {str} explanation: prints reports that have {str} inside their final words\nif {str} is * then all find commands will print all reports loaded\n");
+		printf("Find command details\nusage: findS {str} explanation: prints reports that have {str} inside their surname\nusage: findN {str} explanation: prints reports that have {str} inside their name\nusage: findR {str} explanation: prints reports that have {str} inside their race\nusage: findF {str} explanation: prints reports that have {str} inside their final words\nusage: findC {str} explanation: prints reports that have {str} inside their city\nif {str} is * then all find commands will print all reports loaded\n");
 		found = 1;
 	}
 	if (strcmp(args[1], "print") == 0 || flag)
@@ -850,6 +861,11 @@ char *get_name(report *r)
 char *get_surname(report *r)
 {
 	return r->surname;
+}
+
+char *get_city(report *r)
+{
+	return r->city;
 }
 
 int compare_greater(int age, int argument)
