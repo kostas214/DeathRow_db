@@ -25,7 +25,6 @@ int main(int argc, char *argv[])
 	report *last = NULL;
 	int entries = 0;
 	int err_code = 0;
-	printf("Death Row Browser 1.0\n");
 
 	int i;
 	for (i = 0; i < argc; i++)
